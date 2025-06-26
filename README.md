@@ -13,8 +13,19 @@ A lightweight Python application for Windows that automatically dims and restore
 
 ## Installation
 
+You can either run the app from source using Python, or download a precompiled executable.
+
 1. Clone the repository:
 
    git clone https://github.com/yourusername/windows-brightness-manager.git
 
    cd windows-brightness-manager
+
+2. Install python then run
+
+   pip install PySide6 monitorcontrol pycaw comtypes
+
+3. Run the application.
+   
+   python main.py
+   
