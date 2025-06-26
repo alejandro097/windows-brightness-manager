@@ -2,6 +2,8 @@
 
 A lightweight Python application for Windows that automatically dims and restores monitor brightness based on system idle time and media playback status. Supports multiple monitors with independent brightness controls through a system tray interface.
 
+Only DDC/CI-compatible monitor(s)
+
 ## Features
 
 - Auto-dim monitors after user inactivity (configurable timeout)
