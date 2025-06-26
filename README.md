@@ -7,7 +7,7 @@ Only DDC/CI-compatible monitor(s)
 ## Features
 
 - Auto-dim monitors after user inactivity (configurable timeout)
-- Delay dimming if media (audio/video) is playing
+- Delay dimming if media is playing
 - Restore brightness automatically on activity or media playback
 - Multi-monitor support with individual brightness settings
 - Tray icon with a popup slider for manual brightness control per monitor
