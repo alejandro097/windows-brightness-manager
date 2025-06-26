@@ -1,2 +1,20 @@
-# windows-brightness-manager
-A lightweight Python Windows tray application to automatically dim and restore monitor brightness based on user inactivity and media playback. Supports multi-monitor setups with individual brightness control.
+# Windows Brightness Manager (WIP V1.0)
+
+A lightweight Python application for Windows that automatically dims and restores monitor brightness based on system idle time and media playback status. Supports multiple monitors with independent brightness controls through a system tray interface.
+
+## Features
+
+- Auto-dim monitors after user inactivity (configurable timeout)
+- Delay dimming if media (audio/video) is playing
+- Restore brightness automatically on activity or media playback
+- Multi-monitor support with individual brightness settings
+- Tray icon with a popup slider for manual brightness control per monitor
+- Configurable via a JSON settings file
+
+## Installation
+
+1. Clone the repository:
+
+   git clone https://github.com/yourusername/windows-brightness-manager.git
+
+   cd windows-brightness-manager
