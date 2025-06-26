@@ -28,10 +28,11 @@ Make sure to extract the `.zip` file before running the app.
 
 ##  How to Use
 
-1. Download and extract the `.7z` file.
-2. Double-click `main.exe` to launch the brightness manager.
+1. Download and extract the `.zip` file.
+2. Double-click `wbm.exe` to launch the brightness manager.
 3. App runs in the system tray.
 
+##  How to compile it
 
 1. Clone the repository:
 
