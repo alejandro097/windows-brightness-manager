@@ -90,7 +90,7 @@ DEFAULT_SETTINGS_WRAPPED = {
     },
     "media_grace_period": {
         "value": 15,
-        "description": "Seconds after media stops before dimming"
+        "description": "Seconds after media stops before dimming, this is to prevent dimming when media is buffering"
     },
     "slider_min": {
         "value": 1,
@@ -115,6 +115,14 @@ DEFAULT_SETTINGS_WRAPPED = {
                 "description": "Default dim brightness"
             }
         }
+    },
+    "ignored_media_players": {
+        "value": [
+            "spotify.exe",
+            "winamp.exe",
+            "dopamine.exe"
+        ],
+        "description": "List of media players executables that won't prevent screen from dimming"
     }
 }
 
@@ -149,6 +157,20 @@ def validate_settings(raw):
 
     if raw["slider_min"]["value"] > raw["slider_max"]["value"]:
         raise ValueError("slider_min cannot be higher than slider_max")
+
+    if "ignored_media_players" not in raw:
+        raise ValueError("Missing key: ignored_media_players")
+        
+    players_entry = raw["ignored_media_players"]
+    if not isinstance(players_entry, dict) or "value" not in players_entry:
+        raise ValueError("ignored_media_players must be a dictionary with 'value' key")
+        
+    if not isinstance(players_entry["value"], list):
+        raise ValueError("ignored_media_players value must be a list")
+        
+    for player in players_entry["value"]:
+        if not isinstance(player, str) or not player.lower().endswith(".exe"):
+            raise ValueError(f"Invalid media player name: {player} (must end with .exe)")
 
     per_monitor = raw.get("per_monitor", {})
     for key, monitor_conf in per_monitor.items():
@@ -265,24 +287,61 @@ def is_media_playing_with_grace():
         return True
     return datetime.now() - last_media_detected <= MEDIA_GRACE_PERIOD
 
+def is_media_playing_ignore_whitelist():
+    sessions = AudioUtilities.GetAllSessions()
+    ignored_players = SETTINGS.get("ignored_media_players", [])
+    
+    for session in sessions:
+        if session.State == AudioSessionState.Active:
+            try:
+                process_name = session.Process.name().lower()
+                if any(ignored_player.lower() in process_name 
+                      for ignored_player in ignored_players):
+                    continue
+                return True
+            except:
+                continue
+    return False
 
 def main_loop():
-    global BRIGHTNESS_DIMMED, last_known_brightness
+    global BRIGHTNESS_DIMMED, last_known_brightness, last_media_detected
     comtypes.CoInitialize()
     try:
+        media_start_time = None
+        
         while True:
             idle_time = get_idle_time_seconds()
-            media_playing = is_media_playing_with_grace()
-
-            if idle_time > IDLE_THRESHOLD and not media_playing and not BRIGHTNESS_DIMMED:
-                for monitor_id, monitor_settings in SETTINGS["per_monitor"].items():
-                    current_brightness = get_brightness(int(monitor_id))
-                    if current_brightness >= 1:
-                        last_known_brightness[monitor_id] = current_brightness
-                    schedule_brightness_change(monitor_settings["dim_brightness"], int(monitor_id))
-                BRIGHTNESS_DIMMED = True
-
-            elif (idle_time <= IDLE_THRESHOLD or media_playing) and BRIGHTNESS_DIMMED:
+            current_time = datetime.now()
+            
+            media_playing = is_media_playing_ignore_whitelist()
+            
+            if media_playing:
+                last_media_detected = current_time
+            
+            in_grace_period = (current_time - last_media_detected) <= MEDIA_GRACE_PERIOD
+            
+            if idle_time > IDLE_THRESHOLD:
+                if not BRIGHTNESS_DIMMED and not in_grace_period:
+                    for monitor_id, monitor_settings in SETTINGS["per_monitor"].items():
+                        current_brightness = get_brightness(int(monitor_id))
+                        if current_brightness >= 1:
+                            last_known_brightness[monitor_id] = current_brightness
+                        schedule_brightness_change(monitor_settings["dim_brightness"], int(monitor_id))
+                    BRIGHTNESS_DIMMED = True
+                
+                elif BRIGHTNESS_DIMMED:
+                    if media_playing:
+                        if media_start_time is None:
+                            media_start_time = current_time
+                        elif (current_time - media_start_time).total_seconds() >= 10:
+                            for monitor_id, monitor_settings in SETTINGS["per_monitor"].items():
+                                safe_restore = max(last_known_brightness.get(monitor_id, monitor_settings["brightness_fallback"]), 10)
+                                schedule_brightness_change(safe_restore, int(monitor_id))
+                            BRIGHTNESS_DIMMED = False
+                    else:
+                        media_start_time = None
+            
+            elif BRIGHTNESS_DIMMED:
                 for monitor_id, monitor_settings in SETTINGS["per_monitor"].items():
                     safe_restore = max(last_known_brightness.get(monitor_id, monitor_settings["brightness_fallback"]), 10)
                     schedule_brightness_change(safe_restore, int(monitor_id))
@@ -291,7 +350,7 @@ def main_loop():
             time.sleep(CHECK_INTERVAL)
     finally:
         comtypes.CoUninitialize()
-    
+        
 # ---------------------- Utility Functions ----------------------
 def is_dark_mode():
     try:
