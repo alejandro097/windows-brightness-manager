@@ -21,7 +21,7 @@ You can either run the app from source using Python, or download a precompiled e
 
 You can download the latest version of **Windows Brightness Manager** here:
 
-[Download for Windows (zip)](https://files.catbox.moe/90vcir.zip)
+[Download for Windows V.1.1](https://github.com/alejandro097/windows-brightness-manager/raw/refs/heads/main/wbmanager.zip)
 
 Make sure to extract the `.zip` file before running the app.
 
