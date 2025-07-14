@@ -243,7 +243,17 @@ def get_brightness(monitor_index=0):
     except Exception:
         pass
         
-    return last_known_brightness
+    while True:
+        try:
+            _monitors_cache = list(get_monitors())
+            if 0 <= monitor_index < len(_monitors_cache):
+                with _monitors_cache[monitor_index]:
+                    value = _monitors_cache[monitor_index].get_luminance()
+                    if value >= 1:
+                        return value
+        except Exception as e:
+            print(f"[get_brightness] Failed attempt: {e}")
+        time.sleep(1)
 
 def set_brightness(value, monitor_index=0):
     global _monitors_cache
