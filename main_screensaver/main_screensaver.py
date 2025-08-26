@@ -112,7 +112,7 @@ DEFAULT_SETTINGS_WRAPPED = {
             "winamp.exe",
             "dopamine.exe"
         ],
-        "description": "List of media player or app processes that the script will ignore. The screensaver can still be triggered even if these apps are running and playing media."
+        "description": "Processes to ignore when detecting media playback. Normally, any active media prevents the screensaver, but apps in this list are treated as exceptions (e.g., background music players). This way, listening to music won’t stop the screensaver from starting."
     }
 }
 
